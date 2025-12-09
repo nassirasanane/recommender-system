@@ -1,0 +1,60 @@
+﻿version: '3.8'
+
+services:
+  user-service:
+    build: ./user_service/backend
+    container_name: user-service
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/users_db
+      - FLASK_ENV=development
+    depends_on:
+      - db
+    networks:
+      - recommender-network
+
+  product-service:
+    build: ./product_service/backend
+    container_name: product-service
+    ports:
+      - "5002:5002"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/products_db
+      - FLASK_ENV=development
+    depends_on:
+      - db
+    networks:
+      - recommender-network
+
+  recommendation-service:
+    build: ./recommendation_service/backend
+    container_name: recommendation-service
+    ports:
+      - "5003:5003"
+    environment:
+      - MODEL_PATH=/app/models/recommender_model.h5
+      - USER_SERVICE_URL=http://user-service:5001
+      - PRODUCT_SERVICE_URL=http://product-service:5002
+    networks:
+      - recommender-network
+
+  db:
+    image: postgres:14-alpine
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    networks:
+      - recommender-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  recommender-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
