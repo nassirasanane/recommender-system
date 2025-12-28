@@ -1,0 +1,6 @@
+﻿version: '3.8'
+services:
+  test-app:
+    build: .
+    ports:
+      - "5000:5000"

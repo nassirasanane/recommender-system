@@ -1,0 +1,63 @@
+<div class="container">
+  <h1>Produits Femme 👗</h1>
+
+  <!-- Filtres -->
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>Rechercher</mat-label>
+      <input matInput [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" placeholder="Nom du produit">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Catégorie</mat-label>
+      <mat-select [(ngModel)]="selectedCategory" (selectionChange)="onCategoryChange()">
+        <mat-option value="">Toutes</mat-option>
+        <mat-option *ngFor="let category of categories" [value]="category">
+          {{ category }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" (click)="onSearch()">Rechercher</button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Liste des produits -->
+  <div *ngIf="!loading" class="product-grid">
+    <mat-card *ngFor="let product of products" class="product-card">
+      
+      <!-- IMAGE AJOUTÉE ICI -->
+      <img mat-card-image [src]="getProductImage(product)" [alt]="product.product_name">
+      
+      <mat-card-header>
+        <mat-card-title>{{ product.product_name }}</mat-card-title>
+        <mat-card-subtitle>{{ product.category }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p><strong>Prix:</strong> {{ product.unit_price }} €</p>
+        <p><strong>Note:</strong> {{ product.rating }}/5 ⭐</p>
+        <p><strong>Stock:</strong> {{ product.quantity }}</p>
+        <p><strong>Statut:</strong> {{ product.order_status }}</p>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-button color="primary">Voir détails</button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Pagination -->
+  <mat-paginator 
+    *ngIf="!loading && totalProducts > 0"
+    [length]="totalProducts"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage - 1"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
